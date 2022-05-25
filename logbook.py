@@ -109,14 +109,14 @@ def fill_clock(row, driver):
             By.CSS_SELECTOR, ".ui_tpicker_hour_slider > select:nth-child(1)"
         )
     )
-    hour.select_by_value("{}".format(row["Duty On Hour"]))
+    hour.select_by_value("{}".format(row["Duty Off Hour"]))
 
     minute = Select(
         driver.find_element(
             By.CSS_SELECTOR, ".ui_tpicker_minute_slider > select:nth-child(1)"
         )
     )
-    minute.select_by_value("{}".format(row["Duty On Minute"]))
+    minute.select_by_value("{}".format(row["Duty Off Minute"]))
 
     done = WebDriverWait(driver, 50).until(
         EC.visibility_of_element_located(
