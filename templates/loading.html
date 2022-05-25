@@ -1,33 +1,51 @@
 <html>
   <head>
     <script>
-      function navigate() {
+      async function run() {
+        const response = await fetch("run", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: "{{ email }}",
+            password: "{{ password }}",
+            destination: "{{ destination }}",
+          }),
+        });
+        const reader = response.body.getReader();
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          var string = new TextDecoder().decode(value);
+          document.getElementById("status").innerHTML = string;
+          console.log(string);
+        }
+
         window.location.href = "done";
       }
-      fetch("run", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: "{{ email }}",
-          password: "{{ password }}",
-          destination: "{{ destination }}",
-        }),
-      }).then(navigate);
+
+      run();
     </script>
     <meta charset="UTF-8" />
-    <title>Loading...</title>
-    <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css">
-    <script defer src="https://pyscript.net/alpha/pyscript.js"></script> 
+    <title>Loading</title>
   </head>
   <body>
     <style>
+      .status {
+        position: absolute;
+        margin: -76px 0 0 -8px;
+        text-align: center;
+        top: 50%;
+        width: 100%;
+      }
+
       .loader {
         position: absolute;
         top: 50%;
         left: 50%;
-        margin: -56px 0 0 -56px;
+        margin: -16px 0 0 -56px;
       }
 
       .loader:after {
@@ -37,7 +55,7 @@
         height: 110px;
         border-radius: 50%;
         border: 1px solid;
-        border-color: #0aa13a transparent #47a90e transparent;
+        border-color: black transparent black transparent;
         animation: ring 1.2s linear infinite;
       }
 
@@ -49,7 +67,14 @@
           transform: rotate(360deg);
         }
       }
+
+      .darkmode-layer, .darkmode-toggle {
+        z-index: 500;
+      }
     </style>
+    <h2>User: {{ email }}</h2>
+    <h2 id="status" class="status">Starting</h2>
     <div class="loader"></div>
+    {% include "darkmode.html" %}
   </body>
 </html>

@@ -11,6 +11,11 @@ import pandas
 TIMEOUT = 60
 
 
+def status(message):
+    print(message)
+    return message
+
+
 def wait_until_clickable(driver: webdriver, selector: By, element: str):
     return WebDriverWait(
         driver, TIMEOUT).until(
@@ -30,11 +35,12 @@ def wait_until_invisible(driver: webdriver, selector: By, element: str):
 
 
 def loading(driver: webdriver):
-    print("==> Loading")
+    print("Loading")
     wait_until_invisible(driver, By.CSS_SELECTOR, ".fancybox-overlay")
 
 
 def read_logbook_adira(filename):
+    print("Reading csv file")
     df = pandas.read_csv(
         filename,
         header=6,
@@ -53,15 +59,15 @@ def read_logbook_adira(filename):
         infer_datetime_format=True,
     )
 
-    fill_nan = {
-        "Working Hour",
+    clean_col = {
+        "DATE",
         "Duty On Hour",
         "Duty On Minute",
         "Duty Off Hour",
         "Duty Off Minute",
     }
-    for col in fill_nan:
-        df[col] = pandas.to_numeric(df[col], errors="coerce").fillna(0)
+    for col in clean_col:
+        df = df.drop(df.index[df[col].isnull()])
 
     convert = {
         "Duty On Hour": int,
@@ -76,7 +82,7 @@ def read_logbook_adira(filename):
 
 
 def fill_clock(driver, row):
-    print("==> Filling clock in and out")
+    print("Filling clock in and out")
     clock_in = wait_until_visible(
         driver, By.CSS_SELECTOR,
         ("#logBookEditPopup > div > div > div.item-body > div > "
@@ -135,44 +141,35 @@ def fill_logbook(email, password, filename):
 
     driver = webdriver.Chrome(options=opt)
 
-    print(f"User: {email}")
-
-    print("==> Opening enrichment")
+    yield status("Opening enrichment")
     driver.get("https://enrichment.apps.binus.ac.id/Login/Student/Login")
 
-    print("==> Logging in to enrichment")
+    yield status("Logging in to enrichment")
     wait_until_visible(driver, By.ID, "login_Username").send_keys(email)
     wait_until_visible(driver, By.ID, "login_Password").send_keys(password)
     wait_until_visible(driver, By.ID, "btnLogin").click()
 
     loading(driver)
 
-    print("==> Opening activity enrichment")
+    yield status("Opening activity enrichment")
     wait_until_clickable(driver, By.CSS_SELECTOR, "a.button:nth-child(2)")
-    # WebDriverWait(driver, TIMEOUT).until(
-    #     EC.element_to_be_clickable((By.CSS_SELECTOR, ""))
-    # ).click()
 
     loading(driver)
 
-    print("==> Opening logbook tab")
-    WebDriverWait(driver, TIMEOUT).until(EC.element_to_be_clickable(
-        (By.CSS_SELECTOR, "#btnLogBook > span:nth-child(1)"))).click()
+    yield status("Opening logbook tab")
+    wait_until_clickable(driver, By.CSS_SELECTOR,
+                         "#btnLogBook > span:nth-child(1)")
 
-    print("waiting overlay to close")
-    WebDriverWait(
-        driver, TIMEOUT).until(
-        EC.invisibility_of_element_located(
-            (By.CSS_SELECTOR, ".fancybox-overlay")))
+    loading(driver)
 
-    print("parsing table from website")
+    yield status("Parsing logbook table")
     adira = read_logbook_adira(filename)
 
-    print("DATA USED:")
+    print("Data:")
     print(adira)
 
     for index, row in adira.iterrows():
-        print("Searching for {}".format(row["DATE"]))
+        yield status("Searching for {}".format(row["DATE"]))
         isFound = False
         isGtToday = False
 
@@ -191,10 +188,6 @@ def fill_logbook(email, password, filename):
                     print("{} belom harinya".format(date))
                     isGtToday = True
                     break
-
-                # isSaturday = False
-                # if date.strftime("%A") == "Saturday":
-                #     isSaturday = True
 
                 if str(row["DATE"]) == str(date):
                     print("Found {}".format(row["DATE"]))

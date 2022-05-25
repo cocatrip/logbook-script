@@ -3,9 +3,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
+    <style>
+      .dark-mode {
+        background-color: black;
+        color: white;
+      }
+      .light-mode {
+        background-color: white;
+        color: black;
+      }
+    </style>
+
     <h1>
       Login
     </h1>
+
     <form action="/upload" method="POST" enctype="multipart/form-data">
       <table id="formTable"; cellspacing="5px" cellpadding="5%"; align="left">    
         <tr>    
@@ -25,5 +37,6 @@
           <td><input type="submit" value="Submit"></td>    
         </tr>
     </form>
+    {% include "darkmode.html" %}
   </body>
 </html>
