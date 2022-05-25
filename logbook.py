@@ -143,9 +143,15 @@ def fill_logbook(email, password, filename):
     driver.get("https://enrichment.apps.binus.ac.id/Login/Student/Login")
 
     print("logging in")
-    driver.find_element(By.ID, "login_Username").send_keys(email)
-    driver.find_element(By.ID, "login_Password").send_keys(password)
-    driver.find_element(By.ID, "btnLogin").click()
+    WebDriverWait(driver, TIMEOUT).until(
+        EC.visibility_of_element_located((By.ID, "login_Username"))
+    ).send_keys(email)
+    WebDriverWait(driver, TIMEOUT).until(
+        EC.visibility_of_element_located((By.ID, "login_Password"))
+    ).send_keys(password)
+    WebDriverWait(driver, TIMEOUT).until(
+        EC.visibility_of_element_located((By.ID, "btnLogin"))
+    ).click()
 
     wait_loading(driver)
 
