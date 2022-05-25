@@ -10,12 +10,28 @@ import pandas
 
 TIMEOUT = 60
 
-def wait_loading(driver):
-    # wait for pop up to be visible
-    print("waiting overlay to close")
-    WebDriverWait(driver, TIMEOUT).until(
-        EC.invisibility_of_element_located((By.CSS_SELECTOR, ".fancybox-overlay"))
-    )
+
+def wait_until_clickable(driver: webdriver, selector: By, element: str):
+    return WebDriverWait(
+        driver, TIMEOUT).until(
+        EC.element_to_be_clickable((selector, element))).click()
+
+
+def wait_until_visible(driver: webdriver, selector: By, element: str):
+    return WebDriverWait(
+        driver, TIMEOUT).until(
+        EC.visibility_of_element_located((selector, element)))
+
+
+def wait_until_invisible(driver: webdriver, selector: By, element: str):
+    return WebDriverWait(
+        driver, TIMEOUT).until(
+        EC.invisibility_of_element_located((selector, element)))
+
+
+def loading(driver: webdriver):
+    print("==> Loading")
+    wait_until_invisible(driver, By.CSS_SELECTOR, ".fancybox-overlay")
 
 
 def read_logbook_adira(filename):
@@ -59,73 +75,54 @@ def read_logbook_adira(filename):
     return df
 
 
-def fill_clock(row, driver):
-    clock_in = WebDriverWait(driver, TIMEOUT).until(
-        EC.visibility_of_element_located(
-            (
-                By.CSS_SELECTOR,
-                "#logBookEditPopup > div > div > div.item-body > div > div:nth-child(2) > span > span",
-            )
-        )
-    )
+def fill_clock(driver, row):
+    print("==> Filling clock in and out")
+    clock_in = wait_until_visible(
+        driver, By.CSS_SELECTOR,
+        ("#logBookEditPopup > div > div > div.item-body > div > "
+            "div:nth-child(2) > span > span"))
     driver.execute_script("arguments[0].click();", clock_in)
 
-    hour = Select(
-        driver.find_element(
-            By.CSS_SELECTOR, ".ui_tpicker_hour_slider > select:nth-child(1)"
-        )
-    )
+    hour = Select(driver.find_element(
+        By.CSS_SELECTOR,
+        ".ui_tpicker_hour_slider > select:nth-child(1)"))
     hour.select_by_value("{}".format(row["Duty On Hour"]))
 
     minute = Select(
         driver.find_element(
-            By.CSS_SELECTOR, ".ui_tpicker_minute_slider > select:nth-child(1)"
-        )
-    )
+            By.CSS_SELECTOR,
+            ".ui_tpicker_minute_slider > select:nth-child(1)"))
     minute.select_by_value("{}".format(row["Duty On Minute"]))
 
-    done = WebDriverWait(driver, TIMEOUT).until(
-        EC.visibility_of_element_located(
-            (
-                By.CSS_SELECTOR,
-                "#ui-datepicker-div > div.ui-datepicker-buttonpane.ui-widget-content > button.ui-datepicker-close.ui-state-default.ui-priority-primary.ui-corner-all",
-            )
-        )
-    )
+    done = wait_until_visible(
+        driver, By.CSS_SELECTOR,
+        ("#ui-datepicker-div > "
+            "div.ui-datepicker-buttonpane.ui-widget-content > "
+            "button.ui-datepicker-close.ui-state-default.ui-priority-primary.ui-corner-all"))
     driver.execute_script("arguments[0].click();", done)
 
-    clock_out = WebDriverWait(driver, TIMEOUT).until(
-        EC.visibility_of_element_located(
-            (
-                By.CSS_SELECTOR,
-                "#logBookEditPopup > div > div > div.item-body > div > div:nth-child(4) > span > span",
-            )
-        )
-    )
+    clock_out = wait_until_visible(
+        driver, By.CSS_SELECTOR,
+        ("#logBookEditPopup > div > div > div.item-body > div > "
+            "div:nth-child(4) > span > span"))
     driver.execute_script("arguments[0].click();", clock_out)
 
-    hour = Select(
-        driver.find_element(
-            By.CSS_SELECTOR, ".ui_tpicker_hour_slider > select:nth-child(1)"
-        )
-    )
+    hour = Select(driver.find_element(
+        By.CSS_SELECTOR,
+        ".ui_tpicker_hour_slider > select:nth-child(1)"))
     hour.select_by_value("{}".format(row["Duty Off Hour"]))
 
     minute = Select(
         driver.find_element(
-            By.CSS_SELECTOR, ".ui_tpicker_minute_slider > select:nth-child(1)"
-        )
-    )
+            By.CSS_SELECTOR,
+            ".ui_tpicker_minute_slider > select:nth-child(1)"))
     minute.select_by_value("{}".format(row["Duty Off Minute"]))
 
-    done = WebDriverWait(driver, TIMEOUT).until(
-        EC.visibility_of_element_located(
-            (
-                By.CSS_SELECTOR,
-                "#ui-datepicker-div > div.ui-datepicker-buttonpane.ui-widget-content > button.ui-datepicker-close.ui-state-default.ui-priority-primary.ui-corner-all",
-            )
-        )
-    )
+    done = wait_until_visible(
+        driver, By.CSS_SELECTOR,
+        ("#ui-datepicker-div > "
+            "div.ui-datepicker-buttonpane.ui-widget-content > "
+            "button.ui-datepicker-close.ui-state-default.ui-priority-primary.ui-corner-all"))
     driver.execute_script("arguments[0].click();", done)
 
 
@@ -138,40 +135,35 @@ def fill_logbook(email, password, filename):
 
     driver = webdriver.Chrome(options=opt)
 
-    print("USER: " + email)
+    print(f"User: {email}")
 
-    print("opening enrichment website")
+    print("==> Opening enrichment")
     driver.get("https://enrichment.apps.binus.ac.id/Login/Student/Login")
 
-    print("logging in")
-    WebDriverWait(driver, TIMEOUT).until(
-        EC.visibility_of_element_located((By.ID, "login_Username"))
-    ).send_keys(email)
-    WebDriverWait(driver, TIMEOUT).until(
-        EC.visibility_of_element_located((By.ID, "login_Password"))
-    ).send_keys(password)
-    WebDriverWait(driver, TIMEOUT).until(
-        EC.visibility_of_element_located((By.ID, "btnLogin"))
-    ).click()
+    print("==> Logging in to enrichment")
+    wait_until_visible(driver, By.ID, "login_Username").send_keys(email)
+    wait_until_visible(driver, By.ID, "login_Password").send_keys(password)
+    wait_until_visible(driver, By.ID, "btnLogin").click()
 
-    wait_loading(driver)
+    loading(driver)
 
-    print("visiting activity enrichment")
-    WebDriverWait(driver, TIMEOUT).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, "a.button:nth-child(2)"))
-    ).click()
+    print("==> Opening activity enrichment")
+    wait_until_clickable(driver, By.CSS_SELECTOR, "a.button:nth-child(2)")
+    # WebDriverWait(driver, TIMEOUT).until(
+    #     EC.element_to_be_clickable((By.CSS_SELECTOR, ""))
+    # ).click()
 
-    wait_loading(driver)
+    loading(driver)
 
-    print("open logbook tab")
-    WebDriverWait(driver, TIMEOUT).until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, "#btnLogBook > span:nth-child(1)"))
-    ).click()
+    print("==> Opening logbook tab")
+    WebDriverWait(driver, TIMEOUT).until(EC.element_to_be_clickable(
+        (By.CSS_SELECTOR, "#btnLogBook > span:nth-child(1)"))).click()
 
     print("waiting overlay to close")
-    WebDriverWait(driver, TIMEOUT).until(
-        EC.invisibility_of_element_located((By.CSS_SELECTOR, ".fancybox-overlay"))
-    )
+    WebDriverWait(
+        driver, TIMEOUT).until(
+        EC.invisibility_of_element_located(
+            (By.CSS_SELECTOR, ".fancybox-overlay")))
 
     print("parsing table from website")
     adira = read_logbook_adira(filename)
@@ -207,20 +199,8 @@ def fill_logbook(email, password, filename):
                 if str(row["DATE"]) == str(date):
                     print("Found {}".format(row["DATE"]))
 
-                    isFilled = tr.find_element(
-                        By.CSS_SELECTOR, "td:nth-child(6) > div:nth-child(1)"
-                    ).text.strip()
-
-                    if isFilled != "-":
-                        off = tr.find_element(
-                            By.CSS_SELECTOR, "td:nth-child(5) > div:nth-child(1)"
-                        ).text.strip()
-                        if off != "OFF":
-                            print("already filled")
-                            break
-
                     isOff = False
-                    if row["Activities"] == "off":
+                    if row["Notes"] == "off":
                         print("off")
                         isOff = True
 
@@ -232,44 +212,42 @@ def fill_logbook(email, password, filename):
                     driver.execute_script("arguments[0].click();", entry)
 
                     if not isOff:
-                        fill_clock(row, driver)
+                        fill_clock(driver, row)
 
-                        WebDriverWait(driver, TIMEOUT).until(
+                        notes = WebDriverWait(driver, TIMEOUT).until(
                             EC.visibility_of_element_located(
                                 (By.CSS_SELECTOR, "#editActivity")
                             )
-                        ).clear().send_keys(row["Notes"])
+                        )
+                        notes.clear()
+                        notes.send_keys(row["Notes"])
 
-                        WebDriverWait(driver, TIMEOUT).until(
+                        activities = WebDriverWait(driver, TIMEOUT).until(
                             EC.visibility_of_element_located(
                                 (By.CSS_SELECTOR, "#editDescription")
                             )
-                        ).clear().send_keys(row["Activities"])
-                    else:
-                        off = WebDriverWait(driver, TIMEOUT).until(
-                            EC.visibility_of_element_located(
-                                (
-                                    By.CSS_SELECTOR,
-                                    "#logBookEditPopup > div > div > div.row.text-right > a-encoded:nth-child(1)",
-                                )
-                            )
                         )
+                        activities.clear()
+                        activities.send_keys(row["Activities"])
+                    else:
+                        off = WebDriverWait(
+                            driver, TIMEOUT).until(
+                            EC.visibility_of_element_located(
+                                (By.CSS_SELECTOR,
+                                 "#logBookEditPopup > div > div > div.row.text-right > a-encoded:nth-child(1)",)))
                         driver.execute_script("arguments[0].click();", off)
 
-                    submit = WebDriverWait(driver, TIMEOUT).until(
+                    submit = WebDriverWait(
+                        driver, TIMEOUT).until(
                         EC.visibility_of_element_located(
-                            (
-                                By.CSS_SELECTOR,
-                                "#logBookEditPopup > div > div > div.row.text-right > a-encoded:nth-child(2)",
-                            )
-                        )
-                    )
+                            (By.CSS_SELECTOR,
+                             "#logBookEditPopup > div > div > div.row.text-right > a-encoded:nth-child(2)",)))
                     driver.execute_script("arguments[0].click();", submit)
 
                     WebDriverWait(driver, TIMEOUT).until(EC.alert_is_present())
                     driver.switch_to.alert.accept()
 
-                    wait_loading(driver)
+                    loading(driver)
 
                     isFound = True
                     break
