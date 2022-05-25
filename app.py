@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response, url_for, redirect, make_response
 from logbook import fill_logbook
 import uuid
 import os
@@ -32,8 +32,11 @@ def run():
         email = data["email"]
         password = data["password"]
         destination = data["destination"]
-        fill_logbook(email, password, destination)
-        return "Success"
+
+        def generate():
+            for row in fill_logbook(email, password, destination):
+                yield row + '\n'
+        return Response(generate(), mimetype='text/html')
     else:
         return "Content-Type not supported!"
 
