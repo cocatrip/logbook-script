@@ -2,7 +2,7 @@ name: logbook-script
 
 build:
   logbook-script:
-    image: okteto.dev/logbook-script
+    image: okteto.dev/logbook-script:okteto
     context: .
     dockerfile: Dockerfile
 
