@@ -8,11 +8,12 @@ from selenium import webdriver
 from datetime import datetime
 import pandas
 
+TIMEOUT = 60
 
 def wait_loading(driver):
     # wait for pop up to be visible
     print("waiting overlay to close")
-    WebDriverWait(driver, 50).until(
+    WebDriverWait(driver, TIMEOUT).until(
         EC.invisibility_of_element_located((By.CSS_SELECTOR, ".fancybox-overlay"))
     )
 
@@ -60,7 +61,7 @@ def read_logbook_adira(filename):
 
 
 def fill_clock(row, driver):
-    clock_in = WebDriverWait(driver, 50).until(
+    clock_in = WebDriverWait(driver, TIMEOUT).until(
         EC.visibility_of_element_located(
             (
                 By.CSS_SELECTOR,
@@ -84,7 +85,7 @@ def fill_clock(row, driver):
     )
     minute.select_by_value("{}".format(row["Duty On Minute"]))
 
-    done = WebDriverWait(driver, 50).until(
+    done = WebDriverWait(driver, TIMEOUT).until(
         EC.visibility_of_element_located(
             (
                 By.CSS_SELECTOR,
@@ -94,7 +95,7 @@ def fill_clock(row, driver):
     )
     driver.execute_script("arguments[0].click();", done)
 
-    clock_out = WebDriverWait(driver, 50).until(
+    clock_out = WebDriverWait(driver, TIMEOUT).until(
         EC.visibility_of_element_located(
             (
                 By.CSS_SELECTOR,
@@ -118,7 +119,7 @@ def fill_clock(row, driver):
     )
     minute.select_by_value("{}".format(row["Duty Off Minute"]))
 
-    done = WebDriverWait(driver, 50).until(
+    done = WebDriverWait(driver, TIMEOUT).until(
         EC.visibility_of_element_located(
             (
                 By.CSS_SELECTOR,
@@ -148,19 +149,19 @@ def fill_logbook(email, password, filename):
     wait_loading(driver)
 
     print("visiting activity enrichment")
-    WebDriverWait(driver, 50).until(
+    WebDriverWait(driver, TIMEOUT).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, "a.button:nth-child(2)"))
     ).click()
 
     wait_loading(driver)
 
     print("open logbook tab")
-    WebDriverWait(driver, 50).until(
+    WebDriverWait(driver, TIMEOUT).until(
         EC.element_to_be_clickable((By.CSS_SELECTOR, "#btnLogBook > span:nth-child(1)"))
     ).click()
 
     print("waiting overlay to close")
-    WebDriverWait(driver, 50).until(
+    WebDriverWait(driver, TIMEOUT).until(
         EC.invisibility_of_element_located((By.CSS_SELECTOR, ".fancybox-overlay"))
     )
 
@@ -175,7 +176,7 @@ def fill_logbook(email, password, filename):
         try:
             table = driver.find_element(By.ID, "logBookTable")
         except StaleElementReferenceException:
-            WebDriverWait(driver, 5).until(EC.staleness_of(table))
+            WebDriverWait(driver, TIMEOUT).until(EC.staleness_of(table))
 
         for tr in table.find_elements(By.XPATH, ".//tr"):
             if isFound or isGtToday:
@@ -208,7 +209,7 @@ def fill_logbook(email, password, filename):
                         print("off")
                         isOff = True
 
-                    entry = WebDriverWait(tr, 50).until(
+                    entry = WebDriverWait(tr, TIMEOUT).until(
                         EC.visibility_of_element_located(
                             (By.CSS_SELECTOR, ".dt-Action .button")
                         )
@@ -218,19 +219,19 @@ def fill_logbook(email, password, filename):
                     if not isOff:
                         fill_clock(row, driver)
 
-                        WebDriverWait(driver, 50).until(
+                        WebDriverWait(driver, TIMEOUT).until(
                             EC.visibility_of_element_located(
                                 (By.CSS_SELECTOR, "#editActivity")
                             )
                         ).send_keys(row["Notes"])
 
-                        WebDriverWait(driver, 50).until(
+                        WebDriverWait(driver, TIMEOUT).until(
                             EC.visibility_of_element_located(
                                 (By.CSS_SELECTOR, "#editDescription")
                             )
                         ).send_keys(row["Activities"])
                     else:
-                        off = WebDriverWait(driver, 50).until(
+                        off = WebDriverWait(driver, TIMEOUT).until(
                             EC.visibility_of_element_located(
                                 (
                                     By.CSS_SELECTOR,
@@ -240,7 +241,7 @@ def fill_logbook(email, password, filename):
                         )
                         driver.execute_script("arguments[0].click();", off)
 
-                    submit = WebDriverWait(driver, 50).until(
+                    submit = WebDriverWait(driver, TIMEOUT).until(
                         EC.visibility_of_element_located(
                             (
                                 By.CSS_SELECTOR,
@@ -250,7 +251,7 @@ def fill_logbook(email, password, filename):
                     )
                     driver.execute_script("arguments[0].click();", submit)
 
-                    WebDriverWait(driver, 10).until(EC.alert_is_present())
+                    WebDriverWait(driver, TIMEOUT).until(EC.alert_is_present())
                     driver.switch_to.alert.accept()
 
                     wait_loading(driver)
