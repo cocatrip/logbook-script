@@ -1,0 +1,24 @@
+name: logbook-script
+
+build:
+  logbook-script:
+    context: .
+    dockerfile: Dockerfile
+
+autocreate: true
+image: python:3
+command: ["python", "app.py"]
+workdir: /usr/src/app
+sync:
+ - .:/usr/src/app
+forward:
+- 5000:80
+reverse:
+  - 9000:9001
+securityContext:
+  runAsUser: 1000
+  runAsGroup: 2000
+  fsGroup: 3000
+  capabilities:
+    add:
+    - SYS_PTRACE

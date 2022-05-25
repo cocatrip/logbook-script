@@ -132,6 +132,8 @@ def fill_clock(row, driver):
 def fill_logbook(email, password, filename):
     opt = Options()
     opt.add_argument("--headless")
+    opt.add_argument("--no-sandbox")
+    opt.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Chrome(options=opt)
 
