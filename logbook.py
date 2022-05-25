@@ -211,8 +211,12 @@ def fill_logbook(email, password, filename):
                     ).text.strip()
 
                     if isFilled != "-":
-                        print("already filled")
-                        break
+                        off = tr.find_element(
+                            By.CSS_SELECTOR, "td:nth-child(5) > div:nth-child(1)"
+                        ).text.strip()
+                        if off != "OFF":
+                            print("already filled")
+                            break
 
                     isOff = False
                     if row["Activities"] == "off":
@@ -233,13 +237,13 @@ def fill_logbook(email, password, filename):
                             EC.visibility_of_element_located(
                                 (By.CSS_SELECTOR, "#editActivity")
                             )
-                        ).send_keys(row["Notes"])
+                        ).clear().send_keys(row["Notes"])
 
                         WebDriverWait(driver, TIMEOUT).until(
                             EC.visibility_of_element_located(
                                 (By.CSS_SELECTOR, "#editDescription")
                             )
-                        ).send_keys(row["Activities"])
+                        ).clear().send_keys(row["Activities"])
                     else:
                         off = WebDriverWait(driver, TIMEOUT).until(
                             EC.visibility_of_element_located(
