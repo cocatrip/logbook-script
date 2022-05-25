@@ -32,7 +32,7 @@ def run():
         email = data["email"]
         password = data["password"]
         destination = data["destination"]
-        yield fill_logbook(email, password, destination)
+        fill_logbook(email, password, destination)
         return "Success"
     else:
         return "Content-Type not supported!"
