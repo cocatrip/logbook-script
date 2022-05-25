@@ -1,0 +1,53 @@
+<html>
+  <head>
+    <script>
+        function navigate() {
+            window.location.href = 'done';  // Redirects user to the /map route when 'create_map' is finished
+        }
+        fetch('run', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'email': '{{ email }}',
+                'password': '{{ password }}',
+                'destination': '{{ destination }}',
+            }) 
+        }).then(navigate); // Performing 'create_map' and then calls navigate() function, declared above
+    </script>
+    <meta charset="UTF-8">
+    <title>Loading...</title>
+  </head>
+  <body>
+<style>
+.loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -56px 0 0 -56px;
+}
+
+.loader:after {
+  content: " ";
+  display: block;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 1px solid;
+  border-color: #0aa13a transparent #47a90e transparent;
+  animation: ring 1.2s linear infinite;
+}
+
+@keyframes ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>
+    <div class="loader"></div>
+  </body>
+</html>
