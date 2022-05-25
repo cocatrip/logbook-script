@@ -17,7 +17,8 @@ RUN echo "===> Installing system dependencies..." \
     && echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | tee /etc/apt/sources.list.d/google-chrome.list \
     && apt update && apt install google-chrome-stable -y \
     \
-    && wget https://chromedriver.storage.googleapis.com/2.9/chromedriver_linux64.zip \
+    && CHROMEDRIVER_VERSION=`curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE` \
+    && wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip \
     && unzip chromedriver_linux64.zip \
     && mv chromedriver /usr/bin/chromedriver \
     && chown root:root /usr/bin/chromedriver \
