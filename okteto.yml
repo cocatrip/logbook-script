@@ -7,8 +7,7 @@ build:
     dockerfile: Dockerfile
 
 deploy:
-  - name: Deploy
-  command: helm upgrade --install logbook-script logbook-script --set image=${OKTETO_BUILD_LOGBOOK-SCRIPT_IMAGE}
+  - helm upgrade --install logbook-script logbook-script --set image=${OKTETO_BUILD_LOGBOOK-SCRIPT_IMAGE}
 
 dev:
   logbook-script:
