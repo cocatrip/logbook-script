@@ -48,7 +48,6 @@ def read_logbook_adira(filename):
         df[col] = pandas.to_numeric(df[col], errors="coerce").fillna(0)
 
     convert = {
-        "Working Hour": int,
         "Duty On Hour": int,
         "Duty On Minute": int,
         "Duty Off Hour": int,
@@ -139,6 +138,8 @@ def fill_logbook(email, password, filename):
 
     driver = webdriver.Chrome(options=opt)
 
+    print("USER: " + email)
+
     print("opening enrichment website")
     driver.get("https://enrichment.apps.binus.ac.id/Login/Student/Login")
 
@@ -174,6 +175,8 @@ def fill_logbook(email, password, filename):
 
     print("parsing table from website")
     adira = read_logbook_adira(filename)
+
+    print("DATA USED: " + adira)
 
     for index, row in adira.iterrows():
         print("Searching for {}".format(row["DATE"]))
@@ -212,7 +215,7 @@ def fill_logbook(email, password, filename):
                         break
 
                     isOff = False
-                    if row["Working Hour"] == 0:
+                    if row["Activities"] == "off":
                         print("off")
                         isOff = True
 
