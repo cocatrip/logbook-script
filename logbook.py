@@ -176,7 +176,8 @@ def fill_logbook(email, password, filename):
     print("parsing table from website")
     adira = read_logbook_adira(filename)
 
-    print("DATA USED: " + adira)
+    print("DATA USED:")
+    print(adira)
 
     for index, row in adira.iterrows():
         print("Searching for {}".format(row["DATE"]))
