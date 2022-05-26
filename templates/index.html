@@ -1,37 +1,28 @@
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include "header.html" %}
+    <title>Home</title>
   </head>
   <body>
-    <style>
-      .dark-mode {
-        background-color: black;
-        color: white;
-      }
-      .light-mode {
-        background-color: white;
-        color: black;
-      }
-    </style>
-
-    <h1>
-      Login
-    </h1>
+    <h1>Login</h1>
 
     <form action="/upload" method="POST" enctype="multipart/form-data">
       <table id="formTable"; cellspacing="5px" cellpadding="5%"; align="left">    
         <tr>    
           <td align="right">Email:</td>    
-          <td><input type="text" name="email"/></td>    
+          <td><input type="text" name="email" required></td>    
         </tr>
+
         <tr>    
           <td align="right">Password:</td>    
-          <td><input type="password" name="password"/></td>    
+          <td><input type="password" name="password" required></td>    
         </tr>
+
         <tr>    
           <td align="right">CSV:</td>    
-          <td><input type="file" name="file"/></td>    
+          <td><input type="file" name="file" required></td>    
         </tr>
+
         <tr>    
           <td></td>
           <td><input type="submit" value="Submit"></td>    
