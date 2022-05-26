@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, Response, url_for, redirect, make_response
+from flask import (Flask, render_template, request,
+                   Response, send_from_directory)
 from logbook import fill_logbook
 import uuid
 import os
@@ -44,6 +45,13 @@ def run():
 @app.route("/done")
 def done():
     return render_template("done.html")
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.route("/")
