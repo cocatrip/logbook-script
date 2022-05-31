@@ -1,10 +1,6 @@
 from __future__ import annotations
-
 from typing import Any, List, Optional
-
 from pydantic import BaseModel
-
-import datetime
 
 
 class Month(BaseModel):
@@ -42,27 +38,3 @@ class LogBook(BaseModel):
 
 class LogBooks(BaseModel):
     data: Optional[List[LogBook]] = None
-    filledReject: Optional[int] = None
-    filledEntry: Optional[int] = None
-    filledSubmit: Optional[int] = None
-    filledEmpty: Optional[int] = None
-    filledAppSS: Optional[int] = None
-    filledAppFS: Optional[int] = None
-    filledAll: Optional[int] = None
-    filledRejectFS: Optional[int] = None
-    filledEntryFS: Optional[int] = None
-    curmonth: Optional[str] = None
-    filled: Optional[int] = None
-    aid: Optional[int] = None
-    fscount: Optional[bool] = None
-    fssbtcount: Optional[bool] = None
-    sbtcount: Optional[bool] = None
-    appcount: Optional[bool] = None
-    fsRjtSbmt: Optional[bool] = None
-    cnd: Optional[str] = None
-    feedb: Optional[Any] = None
-    flagjulyactive: Optional[bool] = None
-    validateincompletelogbook: Optional[int] = None
-    validateincompletePreviouslogbook: Optional[bool] = None
-    trackId: Optional[str] = None
-    sbtcountMC: Optional[bool] = None
