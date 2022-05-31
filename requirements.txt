@@ -1,4 +1,5 @@
-flask
-selenium
+BeautifulSoup4
+pydantic
 pandas
+flask
 gunicorn
