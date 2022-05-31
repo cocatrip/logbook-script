@@ -1,42 +1,16 @@
-from selenium.common.exceptions import StaleElementReferenceException
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.common.by import By
-from selenium import webdriver
-from datetime import datetime
+import requests
+from bs4 import BeautifulSoup
+from models import Months, LogBooks
 import pandas
-
-TIMEOUT = 60
-
-
-def status(message):
-    print(message)
-    return message
+import datetime
 
 
-def wait_until_clickable(driver: webdriver, selector: By, element: str):
-    return WebDriverWait(
-        driver, TIMEOUT).until(
-        EC.element_to_be_clickable((selector, element))).click()
-
-
-def wait_until_visible(driver: webdriver, selector: By, element: str):
-    return WebDriverWait(
-        driver, TIMEOUT).until(
-        EC.visibility_of_element_located((selector, element)))
-
-
-def wait_until_invisible(driver: webdriver, selector: By, element: str):
-    return WebDriverWait(
-        driver, TIMEOUT).until(
-        EC.invisibility_of_element_located((selector, element)))
-
-
-def loading(driver: webdriver):
-    print("Loading")
-    wait_until_invisible(driver, By.CSS_SELECTOR, ".fancybox-overlay")
+def convert_time(hour, minute):
+    hour = str(hour)
+    minute = str(minute)
+    time = "{}:{}".format(hour, minute)
+    return str(
+        datetime.datetime.strptime(time, "%H:%M").strftime("%I:%M %p")).lower()
 
 
 def read_logbook_adira(filename):
@@ -46,7 +20,7 @@ def read_logbook_adira(filename):
         header=6,
         names=[
             "Day",
-            "DATE",
+            "Date",
             "Working Hour",
             "Duty On Hour",
             "Duty On Minute",
@@ -55,12 +29,12 @@ def read_logbook_adira(filename):
             "Notes",
             "Activities",
         ],
-        parse_dates=["DATE"],
+        parse_dates=["Date"],
         infer_datetime_format=True,
     )
 
     clean_col = {
-        "DATE",
+        "Date",
         "Duty On Hour",
         "Duty On Minute",
         "Duty Off Hour",
@@ -81,168 +55,134 @@ def read_logbook_adira(filename):
     return df
 
 
-def fill_clock(driver, row):
-    print("Filling clock in and out")
-    clock_in = wait_until_visible(
-        driver, By.CSS_SELECTOR,
-        ("#logBookEditPopup > div > div > div.item-body > div > "
-            "div:nth-child(2) > span > span"))
-    driver.execute_script("arguments[0].click();", clock_in)
+def fill_logbook(email, password, destination):
 
-    hour = Select(driver.find_element(
-        By.CSS_SELECTOR,
-        ".ui_tpicker_hour_slider > select:nth-child(1)"))
-    hour.select_by_value("{}".format(row["Duty On Hour"]))
+    df = read_logbook_adira(destination)
 
-    minute = Select(
-        driver.find_element(
-            By.CSS_SELECTOR,
-            ".ui_tpicker_minute_slider > select:nth-child(1)"))
-    minute.select_by_value("{}".format(row["Duty On Minute"]))
+    session = requests.session()
 
-    done = wait_until_visible(
-        driver, By.CSS_SELECTOR,
-        ("#ui-datepicker-div > "
-            "div.ui-datepicker-buttonpane.ui-widget-content > "
-            "button.ui-datepicker-close.ui-state-default.ui-priority-primary.ui-corner-all"))
-    driver.execute_script("arguments[0].click();", done)
+    url = "https://enrichment.apps.binus.ac.id"
 
-    clock_out = wait_until_visible(
-        driver, By.CSS_SELECTOR,
-        ("#logBookEditPopup > div > div > div.item-body > div > "
-            "div:nth-child(4) > span > span"))
-    driver.execute_script("arguments[0].click();", clock_out)
+    response = session.get(url + "/Login/Student/Login")
 
-    hour = Select(driver.find_element(
-        By.CSS_SELECTOR,
-        ".ui_tpicker_hour_slider > select:nth-child(1)"))
-    hour.select_by_value("{}".format(row["Duty Off Hour"]))
+    soup = BeautifulSoup(response.text, "html.parser")
 
-    minute = Select(
-        driver.find_element(
-            By.CSS_SELECTOR,
-            ".ui_tpicker_minute_slider > select:nth-child(1)"))
-    minute.select_by_value("{}".format(row["Duty Off Minute"]))
+    requestVerificationToken = soup.find(
+        "input", {"name": "__RequestVerificationToken"})["value"]
 
-    done = wait_until_visible(
-        driver, By.CSS_SELECTOR,
-        ("#ui-datepicker-div > "
-            "div.ui-datepicker-buttonpane.ui-widget-content > "
-            "button.ui-datepicker-close.ui-state-default.ui-priority-primary.ui-corner-all"))
-    driver.execute_script("arguments[0].click();", done)
+    response = session.post(url + "/Login/Student/DoLogin", data={
+        "login.Username": email,
+        "login.Password": password,
+        "btnLogin": "Login",
+        "__RequestVerificationToken": requestVerificationToken,
+    })
 
+    soup = BeautifulSoup(response.text, "html.parser")
 
-def fill_logbook(email, password, filename):
-    opt = Options()
-    opt.add_argument("--headless")
-    opt.add_argument("--disable-gpu")
-    opt.add_argument("--no-sandbox")
-    opt.add_argument("--disable-dev-shm-usage")
+    strm = soup.find("option")["value"]
 
-    driver = webdriver.Chrome(options=opt)
+    response = session.post(
+        url + "/Dashboard/Student/IndexStudentDashboard",
+        data={"Strm": strm, })
 
-    yield status("Opening enrichment")
-    driver.get("https://enrichment.apps.binus.ac.id/Login/Student/Login")
+    soup = BeautifulSoup(response.text, "html.parser")
 
-    yield status("Logging in to enrichment")
-    wait_until_visible(driver, By.ID, "login_Username").send_keys(email)
-    wait_until_visible(driver, By.ID, "login_Password").send_keys(password)
-    wait_until_visible(driver, By.ID, "btnLogin").click()
+    activity_enrichment = url + soup.find_all("a",
+                                              {"class": "button"})[1]["href"]
 
-    loading(driver)
+    response = session.get(activity_enrichment)
 
-    yield status("Opening activity enrichment")
-    wait_until_clickable(driver, By.CSS_SELECTOR, "a.button:nth-child(2)")
+    url = "https://activity-enrichment.apps.binus.ac.id"
 
-    loading(driver)
+    response = session.get(url + "/LogBook/GetMonths")
 
-    yield status("Opening logbook tab")
-    wait_until_clickable(driver, By.CSS_SELECTOR,
-                         "#btnLogBook > span:nth-child(1)")
+    months = Months(data=response.json()["data"])
 
-    loading(driver)
+    logbook_header_id = ""
+    for data in months.data:
+        if data.isCurrentMonth is True and data.isWarning is True:
+            logbook_header_id = data.logBookHeaderID
 
-    yield status("Parsing logbook table")
-    adira = read_logbook_adira(filename)
+    response = session.post(url + "/LogBook/GetLogBook", data={
+        "logBookHeaderID": logbook_header_id
+    })
 
-    print("Data:")
-    print(adira)
+    logbooks = LogBooks(data=response.json()["data"])
 
-    for index, row in adira.iterrows():
-        yield status("Searching for {}".format(row["DATE"]))
-        isFound = False
-        isGtToday = False
+    print(df)
 
-        try:
-            table = driver.find_element(By.ID, "logBookTable")
-        except StaleElementReferenceException:
-            WebDriverWait(driver, TIMEOUT).until(EC.staleness_of(table))
+    for data in logbooks.data:
+        date = datetime.datetime.strptime(
+            data.date, "%Y-%m-%dT%H:%M:%S")
+        if date.strftime("%w") == "6":
+            print("Saturday")
+            id_form = data.id
+            logbook_header_id_form = data.logBookHeaderID
+            date_form = data.date
+            activity_form = "OFF"
+            clockin_form = "OFF"
+            clockout_form = "OFF"
+            description_form = "OFF"
 
-        for tr in table.find_elements(By.XPATH, ".//tr"):
-            if isFound or isGtToday:
-                break
+            response = session.post(
+                url + "/LogBook/StudentSave",
+                data={"model[ID]": id_form,
+                      "model[LogBookHeaderID]": logbook_header_id_form,
+                      "model[Date]": date_form,
+                      "model[Activity]": activity_form,
+                      "model[ClockIn]": clockin_form,
+                      "model[ClockOut]": clockout_form,
+                      "model[Description]": description_form})
 
-            for td in tr.find_elements(By.XPATH, ".//td[1]"):
-                date = datetime.strptime(td.text, "%a, %d %b %Y")
-                if date > datetime.today():
-                    print("{} belom harinya".format(date))
-                    isGtToday = True
-                    break
+            print(response.json()["status"])
+            yield(response.json()["status"])
 
-                if str(row["DATE"]) == str(date):
-                    print("Found {}".format(row["DATE"]))
+    for i in range(0, len(df)):
+        id_form = None
+        logbook_header_id_form = None
+        date_form = None
+        activity_form = None
+        clockin_form = None
+        clockout_form = None
+        description_form = None
+        for data in logbooks.data:
+            date = datetime.datetime.strptime(
+                data.date, "%Y-%m-%dT%H:%M:%S")
+            if df["Date"][i] == date:
+                yield("Filling {}".format(data.date))
+                if df["Notes"][i] == "WFO" or df["Notes"][i] == "WFH":
+                    clock_in = convert_time(
+                        df["Duty On Hour"][i],
+                        df["Duty On Minute"][i])
+                    clock_out = convert_time(
+                        df["Duty Off Hour"][i],
+                        df["Duty Off Minute"][i])
 
-                    isOff = False
-                    if row["Notes"] == "off":
-                        print("off")
-                        isOff = True
+                    id_form = data.id
+                    logbook_header_id_form = data.logBookHeaderID
+                    date_form = data.date
+                    activity_form = df["Notes"][i]
+                    clockin_form = clock_in
+                    clockout_form = clock_out
+                    description_form = df["Activities"][i]
+                elif df["Notes"][i] == "off":
+                    id_form = data.id
+                    logbook_header_id_form = data.logBookHeaderID
+                    date_form = data.date
+                    activity_form = "OFF"
+                    clockin_form = "OFF"
+                    clockout_form = "OFF"
+                    description_form = "OFF"
 
-                    entry = WebDriverWait(tr, TIMEOUT).until(
-                        EC.visibility_of_element_located(
-                            (By.CSS_SELECTOR, ".dt-Action .button")
-                        )
-                    )
-                    driver.execute_script("arguments[0].click();", entry)
+                response = session.post(
+                    url + "/LogBook/StudentSave",
+                    data={"model[ID]": id_form,
+                          "model[LogBookHeaderID]": logbook_header_id_form,
+                          "model[Date]": date_form,
+                          "model[Activity]": activity_form,
+                          "model[ClockIn]": clockin_form,
+                          "model[ClockOut]": clockout_form,
+                          "model[Description]": description_form})
 
-                    if not isOff:
-                        fill_clock(driver, row)
-
-                        notes = WebDriverWait(driver, TIMEOUT).until(
-                            EC.visibility_of_element_located(
-                                (By.CSS_SELECTOR, "#editActivity")
-                            )
-                        )
-                        notes.clear()
-                        notes.send_keys(row["Notes"])
-
-                        activities = WebDriverWait(driver, TIMEOUT).until(
-                            EC.visibility_of_element_located(
-                                (By.CSS_SELECTOR, "#editDescription")
-                            )
-                        )
-                        activities.clear()
-                        activities.send_keys(row["Activities"])
-                    else:
-                        off = WebDriverWait(
-                            driver, TIMEOUT).until(
-                            EC.visibility_of_element_located(
-                                (By.CSS_SELECTOR,
-                                 "#logBookEditPopup > div > div > div.row.text-right > a-encoded:nth-child(1)",)))
-                        driver.execute_script("arguments[0].click();", off)
-
-                    submit = WebDriverWait(
-                        driver, TIMEOUT).until(
-                        EC.visibility_of_element_located(
-                            (By.CSS_SELECTOR,
-                             "#logBookEditPopup > div > div > div.row.text-right > a-encoded:nth-child(2)",)))
-                    driver.execute_script("arguments[0].click();", submit)
-
-                    WebDriverWait(driver, TIMEOUT).until(EC.alert_is_present())
-                    driver.switch_to.alert.accept()
-
-                    loading(driver)
-
-                    isFound = True
-                    break
-
-    driver.close()
+                print(response.json()["status"])
+                yield(response.json()["status"])
