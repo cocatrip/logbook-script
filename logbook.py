@@ -56,7 +56,6 @@ def read_logbook_adira(filename):
 
 
 def fill_logbook(email, password, destination):
-
     df = read_logbook_adira(destination)
 
     session = requests.session()
@@ -100,8 +99,12 @@ def fill_logbook(email, password, destination):
 
     logbook_header_id = ""
     for data in months.data:
-        if data.isCurrentMonth is True and data.isWarning is True:
+        if data.isWarning is True:
             logbook_header_id = data.logBookHeaderID
+            break
+        elif data.isCurrentMonth is True:
+            logbook_header_id = data.logBookHeaderID
+            break
 
     response = session.post(url + "/LogBook/GetLogBook", data={
         "logBookHeaderID": logbook_header_id
@@ -109,13 +112,14 @@ def fill_logbook(email, password, destination):
 
     logbooks = LogBooks(data=response.json()["data"])
 
-    print(df)
+    # print(df)
 
+    print("Filling all saturday as off")
+    yield("Filling all saturday as off")
     for data in logbooks.data:
         date = datetime.datetime.strptime(
             data.date, "%Y-%m-%dT%H:%M:%S")
         if date.strftime("%w") == "6":
-            print("Saturday")
             id_form = data.id
             logbook_header_id_form = data.logBookHeaderID
             date_form = data.date
@@ -149,8 +153,9 @@ def fill_logbook(email, password, destination):
             date = datetime.datetime.strptime(
                 data.date, "%Y-%m-%dT%H:%M:%S")
             if df["Date"][i] == date:
+                print("Filling {}".format(data.date))
                 yield("Filling {}".format(data.date))
-                if df["Notes"][i] == "WFO" or df["Notes"][i] == "WFH":
+                if df["Notes"][i].lower() in ("wfo", "wfh"):
                     clock_in = convert_time(
                         df["Duty On Hour"][i],
                         df["Duty On Minute"][i])
@@ -165,7 +170,7 @@ def fill_logbook(email, password, destination):
                     clockin_form = clock_in
                     clockout_form = clock_out
                     description_form = df["Activities"][i]
-                elif df["Notes"][i] == "off":
+                elif df["Notes"][i].lower() == "off":
                     id_form = data.id
                     logbook_header_id_form = data.logBookHeaderID
                     date_form = data.date

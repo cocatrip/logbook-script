@@ -1,33 +1,89 @@
+<!DOCTYPE html>
+
 <html>
   <head>
     {% include "header.html" %}
     <title>Home</title>
   </head>
   <body>
+    <style>
+      li {
+        margin: 10px 0;
+      }
+    </style>
     <h1>Login</h1>
-
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-      <table id="formTable"; cellspacing="5px" cellpadding="5%"; align="left">    
-        <tr>    
-          <td align="right">Email:</td>    
-          <td><input type="email" name="email" required></td>    
+    <table id="formTable" ; cellspacing="5px" cellpadding="5%" ;>
+      <form action="/upload" method="POST" enctype="multipart/form-data">
+        <tr>
+          <td align="right">Email:</td>
+          <td>
+            <input
+              type="email"
+              name="email"
+              placeholder="john.doe@binus.ac.id"
+              required
+            />
+          </td>
         </tr>
 
-        <tr>    
-          <td align="right">Password:</td>    
-          <td><input type="password" name="password" required></td>    
+        <tr>
+          <td align="right">Password:</td>
+          <td>
+            <input
+              type="password"
+              name="password"
+              placeholder="password123"
+              required
+            />
+          </td>
         </tr>
 
-        <tr>    
-          <td align="right">CSV:</td>    
-          <td><input type="file" name="file" required></td>    
+        <tr>
+          <td align="right">CSV:</td>
+          <td><input type="file" name="file" required /></td>
         </tr>
 
-        <tr>    
-          <td></td>
-          <td><input type="submit" value="Submit"></td>    
+        <tr>
+          <td align="right"></td>
+          <td><input type="submit" value="Submit" /></td>
         </tr>
-    </form>
+      </form>
+    </table>
+
+    <h2>How to</h2>
+    <ul>
+      <li>
+        Download csv dulu dari logbook di sheets<br />
+        <code>File > Download > Comma-separated values (.csv)</code>
+      </li>
+
+      <li>Masukin email sama password</li>
+
+      <li>Upload csv file yang tadi di download</li>
+
+      <li>Submit terus udah deh tunggu ampe kelar</li>
+    </ul>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>
+        Semua hari sabtu by default bakal di set jadi off, kalo mau di ganti isi
+        aja di logbook hari sabtu
+      </li>
+      <li>
+        Kalo mau bikin row nya keisi sebagai off, isi off(case-insensitive) di
+        kolom Notes
+      </li>
+      <li>
+        Ini (kalo ga salah ya) bisa bypass kalo udah submit, jadi nanti isinya
+        tetep bisa ke ganti walau tombol edit udah ilang
+      </li>
+      <li>
+        Bulan yang bakal keisi itu bulan yang ada buletan merahnya duluan karena
+        itu prioritas kalo ga ya fallback ke bulan sekarang
+      </li>
+    </ul>
+
     {% include "darkmode.html" %}
   </body>
 </html>
