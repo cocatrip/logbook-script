@@ -50,39 +50,50 @@
       </form>
     </table>
 
-    <h2>How to</h2>
-    <ul>
-      <li>
-        Download csv dulu dari logbook di sheets<br />
-        <code>File > Download > Comma-separated values (.csv)</code>
-      </li>
+    <table id="formTable" ; cellspacing="5px" cellpadding="5%" ;>
+      <tr>
+        <h2>How to</h2>
+        <ul>
+          <li>
+            Download csv dulu dari logbook di sheets<br />
+            <code>File > Download > Comma-separated values (.csv)</code>
+          </li>
 
-      <li>Masukin email sama password</li>
+          <li>Masukin email sama password</li>
 
-      <li>Upload csv file yang tadi di download</li>
+          <li>Upload csv file yang tadi di download</li>
 
-      <li>Submit terus udah deh tunggu ampe kelar</li>
-    </ul>
+          <li>Submit terus udah deh tunggu ampe kelar</li>
+        </ul>
+      </tr>
 
-    <h2>Tips</h2>
-    <ul>
-      <li>
-        Semua hari sabtu by default bakal di set jadi off, kalo mau di ganti isi
-        aja di logbook hari sabtu
-      </li>
-      <li>
-        Kalo mau bikin row nya keisi sebagai off, isi off(case-insensitive) di
-        kolom Notes
-      </li>
-      <li>
-        Ini (kalo ga salah ya) bisa bypass kalo udah submit, jadi nanti isinya
-        tetep bisa ke ganti walau tombol edit udah ilang
-      </li>
-      <li>
-        Bulan yang bakal keisi itu bulan yang ada buletan merahnya duluan karena
-        itu prioritas kalo ga ya fallback ke bulan sekarang
-      </li>
-    </ul>
+      <tr>
+        <h2>Tips</h2>
+        <ul>
+          <li>
+            Semua hari sabtu by default bakal di set jadi off, kalo mau di ganti
+            isi aja di logbook hari sabtu
+          </li>
+          <li>
+            Kalo mau bikin row nya keisi sebagai off, isi off(case-insensitive)
+            di kolom Notes
+          </li>
+          <li>
+            Bulan yang bakal keisi itu bulan yang ada buletan merahnya duluan
+            karena itu prioritas, kalo ga ya fallback ke bulan sekarang
+          </li>
+        </ul>
+      </tr>
+      <tr>
+        <footer>
+          <br />
+          <b>github:</b>
+          <a href="github.com/cocatrip/logbook-uploader"
+            >cocatrip/logbook-script</a
+          >
+        </footer>
+      </tr>
+    </table>
 
     {% include "darkmode.html" %}
   </body>
