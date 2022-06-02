@@ -1,6 +1,7 @@
 from flask import (Flask, render_template, request,
                    Response, send_from_directory)
 from logbook import fill_logbook
+import pathlib
 import uuid
 import os
 
@@ -16,10 +17,17 @@ def upload():
 
     email = request.form["email"]
     password = request.form["password"]
+
     file = request.files["file"]
+    extension = pathlib.Path(file.filename).suffix
+    error = "Extension {} not supported!".format(extension)
+    if extension != ".csv":
+        return render_template("error.html", error=error)
+
     filename = str(uuid.uuid4()) + ".csv"
     destination = '/'.join([target, filename])
     file.save(destination)
+
     return render_template(
         "loading.html", email=email, password=password,
         destination=destination)

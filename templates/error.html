@@ -1,0 +1,28 @@
+<html>
+  <head>
+    {% include "header.html" %}
+    <title>Error</title>
+  </head>
+  <body>
+    <h1>Error</h1>
+
+    <p>{{ error }}</p>
+    <p>redirecting to <a href="/">home</a> in <b id="countdown">3</b></p>
+
+    {% include "darkmode.html" %}
+    <script>
+      var time = 2;
+      var interval = setInterval(function() {
+        if (time >= 0) {
+          element = document.getElementById("countdown");
+          element.innerHTML = time;
+          time--;
+        } else {
+          clearInterval(interval);
+          window.location.href = "/";
+        }
+      }, 1000);
+      // setTimeout(function () {window.location = "/";}, 3000);
+    </script>
+  </body>
+</html>

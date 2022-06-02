@@ -56,6 +56,8 @@ def read_logbook_adira(filename):
 
 
 def fill_logbook(email, password, destination):
+    print(email)
+
     df = read_logbook_adira(destination)
 
     session = requests.session()
