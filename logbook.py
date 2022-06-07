@@ -91,9 +91,9 @@ def fill_logbook(email, password, destination):
     })
 
     # find strm for getting SSO to activity enrichment
-    soup = BeautifulSoup(response.text, "html.parser")
+    # soup = BeautifulSoup(response.text, "html.parser")
 
-    strm = soup.find("option")["value"]
+    strm = "2120"
 
     response = session.post(
         url + "/Dashboard/Student/IndexStudentDashboard",
