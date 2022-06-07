@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from models import Months, LogBooks
 import pandas
+import numpy
 import datetime
 
 
@@ -29,19 +30,27 @@ def read_logbook_adira(filename):
             "Notes",
             "Activities",
         ],
-        parse_dates=["Date"],
-        infer_datetime_format=True,
     )
 
+    # ilangin semua yang gada dates & notes
     clean_col = {
         "Date",
+        "Notes"
+    }
+
+    for col in clean_col:
+        df = df.drop(df.index[df[col].isnull()])
+
+    df["Date"] = pandas.to_datetime(df["Date"], format="%d-%m-%Y")
+
+    fill_nan = {
         "Duty On Hour",
         "Duty On Minute",
         "Duty Off Hour",
         "Duty Off Minute",
     }
-    for col in clean_col:
-        df = df.drop(df.index[df[col].isnull()])
+    for col in fill_nan:
+        df[col] = df[col].replace(numpy.nan, 0)
 
     convert = {
         "Duty On Hour": int,
@@ -58,12 +67,15 @@ def read_logbook_adira(filename):
 def fill_logbook(email, password, destination):
     print(email)
 
+    # read csv file
     df = read_logbook_adira(destination)
 
+    # create new session
     session = requests.session()
 
     url = "https://enrichment.apps.binus.ac.id"
 
+    # login
     response = session.get(url + "/Login/Student/Login")
 
     soup = BeautifulSoup(response.text, "html.parser")
@@ -78,6 +90,7 @@ def fill_logbook(email, password, destination):
         "__RequestVerificationToken": requestVerificationToken,
     })
 
+    # find strm for getting SSO to activity enrichment
     soup = BeautifulSoup(response.text, "html.parser")
 
     strm = soup.find("option")["value"]
@@ -86,6 +99,7 @@ def fill_logbook(email, password, destination):
         url + "/Dashboard/Student/IndexStudentDashboard",
         data={"Strm": strm, })
 
+    # going to activity enrichment
     soup = BeautifulSoup(response.text, "html.parser")
 
     activity_enrichment = url + soup.find_all("a",
@@ -95,10 +109,12 @@ def fill_logbook(email, password, destination):
 
     url = "https://activity-enrichment.apps.binus.ac.id"
 
+    # get all months and parse to class
     response = session.get(url + "/LogBook/GetMonths")
 
     months = Months(data=response.json()["data"])
 
+    # detect which month should be filled and get the header id
     logbook_header_id = ""
     for data in months.data:
         if data.isWarning is True:
@@ -108,13 +124,12 @@ def fill_logbook(email, password, destination):
             logbook_header_id = data.logBookHeaderID
             break
 
+    # get all logbook and parse to class
     response = session.post(url + "/LogBook/GetLogBook", data={
         "logBookHeaderID": logbook_header_id
     })
 
     logbooks = LogBooks(data=response.json()["data"])
-
-    # print(df)
 
     print("Filling all saturday as off")
     yield("Filling all saturday as off")
