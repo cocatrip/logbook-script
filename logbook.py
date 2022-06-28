@@ -41,7 +41,12 @@ def read_logbook_adira(filename):
     for col in clean_col:
         df = df.drop(df.index[df[col].isnull()])
 
-    df["Date"] = pandas.to_datetime(df["Date"], format="%d-%m-%Y")
+    try:
+        df["Date"] = pandas.to_datetime(
+            df["Date"], errors="raise", format="%d-%m-%Y")
+    except Exception:
+        df["Date"] = pandas.to_datetime(
+            df["Date"], errors="raise", format="%d/%m/%Y")
 
     fill_nan = {
         "Duty On Hour",
