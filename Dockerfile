@@ -1,9 +1,12 @@
-FROM python:3.10.5-slim 
+FROM python:3.10.5-alpine
 
 WORKDIR /usr/src/app
 
+RUN apk add --update --no-cache build-base
+
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+
+RUN pip install --verbose --no-cache-dir -r requirements.txt
 
 COPY . .
 
