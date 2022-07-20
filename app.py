@@ -44,7 +44,7 @@ def run():
 
         def generate():
             for row in fill_logbook(email, password, destination):
-                yield row + '\n'
+                yield(row + '\n')
         return Response(generate(), mimetype='text/html')
     else:
         return "Content-Type not supported!"

@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from models import Months, LogBooks
 import pandas
 import numpy
-import datetime
+from datetime import datetime
 
 
 def convert_time(hour, minute):
@@ -11,7 +11,7 @@ def convert_time(hour, minute):
     minute = str(minute)
     time = "{}:{}".format(hour, minute)
     return str(
-        datetime.datetime.strptime(time, "%H:%M").strftime("%I:%M %p")).lower()
+        datetime.strptime(time, "%H:%M").strftime("%I:%M %p")).lower()
 
 
 def read_logbook_adira(filename):
@@ -41,12 +41,8 @@ def read_logbook_adira(filename):
     for col in clean_col:
         df = df.drop(df.index[df[col].isnull()])
 
-    try:
-        df["Date"] = pandas.to_datetime(
-            df["Date"], errors="raise", format="%d-%m-%Y")
-    except Exception:
-        df["Date"] = pandas.to_datetime(
-            df["Date"], errors="raise", format="%d/%m/%Y")
+    df["Date"] = pandas.to_datetime(df["Date"])
+    df["Date"] = df["Date"].dt.strftime("%Y-%m-%dT%H:%M:%S")
 
     fill_nan = {
         "Duty On Hour",
@@ -74,6 +70,10 @@ def fill_logbook(email, password, destination):
 
     # read csv file
     df = read_logbook_adira(destination)
+    if df.empty:
+        yield("Empty Dataframe")
+        return -1
+    print(df)
 
     # create new session
     session = requests.session()
@@ -141,8 +141,7 @@ def fill_logbook(email, password, destination):
     print("Filling all saturday as off")
     yield("Filling all saturday as off")
     for data in logbooks.data:
-        date = datetime.datetime.strptime(
-            data.date, "%Y-%m-%dT%H:%M:%S")
+        date = datetime.strptime(data.date, "%Y-%m-%dT%H:%M:%S")
         if date.strftime("%w") == "6":
             id_form = data.id
             logbook_header_id_form = data.logBookHeaderID
@@ -174,9 +173,7 @@ def fill_logbook(email, password, destination):
         clockout_form = None
         description_form = None
         for data in logbooks.data:
-            date = datetime.datetime.strptime(
-                data.date, "%Y-%m-%dT%H:%M:%S")
-            if df["Date"][i] == date:
+            if df["Date"][i] == data.date:
                 print("Filling {}".format(data.date))
                 yield("Filling {}".format(data.date))
                 if df["Notes"][i].lower() in ("wfo", "wfh"):
@@ -215,3 +212,7 @@ def fill_logbook(email, password, destination):
 
                 print(response.json()["status"])
                 yield(response.json()["status"])
+                break
+            elif df["Date"][i] != date:
+                print("Skipping {}".format(data.date))
+                yield("Skipping {}".format(data.date))

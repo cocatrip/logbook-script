@@ -18,6 +18,8 @@ FROM python:3.10.5-alpine
 
 WORKDIR /usr/src/app
 
+RUN apk add --update --no-cache libstdc++
+
 COPY --from=builder /opt/venv /opt/venv
 
 ENV PATH="/opt/venv/bin:$PATH"
