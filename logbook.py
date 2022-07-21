@@ -30,6 +30,7 @@ def read_logbook_adira(filename):
             "Notes",
             "Activities",
         ],
+        infer_datetime_format=True,
     )
 
     # ilangin semua yang gada dates & notes
@@ -41,7 +42,9 @@ def read_logbook_adira(filename):
     for col in clean_col:
         df = df.drop(df.index[df[col].isnull()])
 
-    df["Date"] = pandas.to_datetime(df["Date"])
+    df["Date"] = pandas.to_datetime(
+        df["Date"], errors="coerce", format="%d-%m-%Y")
+
     df["Date"] = df["Date"].dt.strftime("%Y-%m-%dT%H:%M:%S")
 
     fill_nan = {
@@ -65,6 +68,13 @@ def read_logbook_adira(filename):
     return df
 
 
+def find_by_date(logbook, date):
+    try:
+        return next(i for i in range(len(logbook)) if date == logbook[i].date)
+    except StopIteration:
+        raise ValueError(f"No matching record found for {date}")
+
+
 def fill_logbook(email, password, destination):
     print(email)
 
@@ -73,7 +83,7 @@ def fill_logbook(email, password, destination):
     if df.empty:
         yield("Empty Dataframe")
         return -1
-    print(df)
+    print(df["Date"])
 
     # create new session
     session = requests.session()
@@ -172,47 +182,51 @@ def fill_logbook(email, password, destination):
         clockin_form = None
         clockout_form = None
         description_form = None
-        for data in logbooks.data:
-            if df["Date"][i] == data.date:
-                print("Filling {}".format(data.date))
-                yield("Filling {}".format(data.date))
-                if df["Notes"][i].lower() in ("wfo", "wfh"):
-                    clock_in = convert_time(
-                        df["Duty On Hour"][i],
-                        df["Duty On Minute"][i])
-                    clock_out = convert_time(
-                        df["Duty Off Hour"][i],
-                        df["Duty Off Minute"][i])
 
-                    id_form = data.id
-                    logbook_header_id_form = data.logBookHeaderID
-                    date_form = data.date
-                    activity_form = df["Notes"][i]
-                    clockin_form = clock_in
-                    clockout_form = clock_out
-                    description_form = df["Activities"][i]
-                elif df["Notes"][i].lower() == "off":
-                    id_form = data.id
-                    logbook_header_id_form = data.logBookHeaderID
-                    date_form = data.date
-                    activity_form = "OFF"
-                    clockin_form = "OFF"
-                    clockout_form = "OFF"
-                    description_form = "OFF"
+        index = None
+        try:
+            index = find_by_date(logbooks.data, df["Date"][i])
+            print(index)
+        except ValueError as err:
+            print(str(err))
+            continue
 
-                response = session.post(
-                    url + "/LogBook/StudentSave",
-                    data={"model[ID]": id_form,
-                          "model[LogBookHeaderID]": logbook_header_id_form,
-                          "model[Date]": date_form,
-                          "model[Activity]": activity_form,
-                          "model[ClockIn]": clockin_form,
-                          "model[ClockOut]": clockout_form,
-                          "model[Description]": description_form})
+        logbook = logbooks.data
+        print("Filling {}".format(logbook[index].date))
+        yield("Filling {}".format(logbook[index].date))
+        if df["Notes"][i].lower() in ("wfo", "wfh"):
+            clock_in = convert_time(
+                df["Duty On Hour"][i],
+                df["Duty On Minute"][i])
+            clock_out = convert_time(
+                df["Duty Off Hour"][i],
+                df["Duty Off Minute"][i])
 
-                print(response.json()["status"])
-                yield(response.json()["status"])
-                break
-            elif df["Date"][i] != date:
-                print("Skipping {}".format(data.date))
-                yield("Skipping {}".format(data.date))
+            id_form = logbook[index].id
+            logbook_header_id_form = logbook[index].logBookHeaderID
+            date_form = logbook[index].date
+            activity_form = df["Notes"][i]
+            clockin_form = clock_in
+            clockout_form = clock_out
+            description_form = df["Activities"][i]
+        elif df["Notes"][i].lower() == "off":
+            id_form = logbook[index].id
+            logbook_header_id_form = logbook[index].logBookHeaderID
+            date_form = logbook[index].date
+            activity_form = "OFF"
+            clockin_form = "OFF"
+            clockout_form = "OFF"
+            description_form = "OFF"
+
+        response = session.post(
+            url + "/LogBook/StudentSave",
+            data={"model[ID]": id_form,
+                  "model[LogBookHeaderID]": logbook_header_id_form,
+                  "model[Date]": date_form,
+                  "model[Activity]": activity_form,
+                  "model[ClockIn]": clockin_form,
+                  "model[ClockOut]": clockout_form,
+                  "model[Description]": description_form})
+
+        print(response.json()["status"])
+        yield(response.json()["status"])
