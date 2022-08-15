@@ -180,8 +180,8 @@ def fill_logbook(email, password, destination):
                 print(response.json()["status"])
                 yield(response.json()["status"])
 
-        ll = len(df)
-        for i in range(0, ll):
+        df = read_logbook_adira(destination)
+        for i in range(0, len(df)):
             id_form = None
             logbook_header_id_form = None
             date_form = None
