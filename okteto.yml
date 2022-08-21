@@ -6,4 +6,4 @@ build:
     dockerfile: Dockerfile
 
 deploy:
-  - helm upgrade --install logbook-script chart --set image.name=${OKTETO_BUILD_APP_IMAGE}
+  - helm upgrade --install logbook-script chart

@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  name: ""
+  name: okteto.dev/logbook-script:okteto
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
