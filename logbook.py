@@ -101,7 +101,7 @@ def fill_logbook(email, password, destination):
     if df.empty:
         yield("Empty Dataframe")
         return -1
-    print(df["Date"])
+    print(df[["Date", "Notes"]])
 
     # create new session
     session = requests.session()
