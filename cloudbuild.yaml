@@ -6,4 +6,4 @@ images:
 - 'asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA'
 
 options:
-  logging: GCS_ONLY
+  logging: CLOUD_LOGGING_ONLY
