@@ -1,19 +1,22 @@
 steps:
+  # build image
 - name: 'gcr.io/cloud-builders/docker'
   args: [ 'build', '-t', 'asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA', '.' ]
-  timeout: 7200s
+  # push image
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA']
+  # deploy image
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
   args:
   - 'run'
   - 'deploy'
   - 'logbook-script'
-  - '--image'
-  - 'asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA'
-  - '--region'
-  - 'asia-southeast2'
+  - '--service-account=cocatrip@ct-master.iam.gserviceaccount.com'
+  - '--image=asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA'
+  - '--region=asia-southeast2'
+  - '--allow-unauthenticated'
+  - '--port=8000'
 
 images:
 - 'asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA'
