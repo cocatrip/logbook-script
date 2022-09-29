@@ -1,4 +1,4 @@
-FROM python:3.10.5-alpine as builder
+FROM amancevice/pandas:alpine as builder
 
 WORKDIR /usr/src/app
 
@@ -10,7 +10,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY requirements.txt ./
 
-RUN pip install --verbose --no-cache-dir -r requirements.txt
+RUN pip install --verbose --upgrade pip
+
+RUN pip install --verbose --requirement requirements.txt
 
 
 FROM python:3.10.5-alpine
