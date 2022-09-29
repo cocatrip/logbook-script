@@ -1,7 +1,7 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: [ 'build', '-t', 'asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA', '.' ]
-  timeout: 3000s
+  timeout: 7200s
 
 images:
 - 'asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA'
@@ -9,4 +9,4 @@ images:
 options:
   logging: CLOUD_LOGGING_ONLY
 
-timeout: 3000s
+timeout: 7200s
