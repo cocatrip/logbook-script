@@ -7,7 +7,7 @@ To run this app locally on your machine:
 
 1. Install all required libraries
 
-```pip install requirements.txt```
+```pip install --requirement requirements.txt```
 
 2. Run the app using gunicorn
 
