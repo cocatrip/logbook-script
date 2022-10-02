@@ -14,7 +14,7 @@ steps:
   - 'logbook-script'
   - '--service-account=cocatrip@ct-master.iam.gserviceaccount.com'
   - '--image=asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA'
-  - '--region=asia-southeast2'
+  - '--region=asia-southeast1'
   - '--allow-unauthenticated'
   - '--port=8000'
 
