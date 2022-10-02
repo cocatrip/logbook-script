@@ -19,7 +19,9 @@ FROM python:3.10.5-alpine
 
 WORKDIR /usr/src/app
 
-RUN apk add --update --no-cache libstdc++
+RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+
+RUN apk add --update --no-cache libstdc++ py3-numpy py3-pandas@testing
 
 COPY --from=builder /opt/venv /opt/venv
 
