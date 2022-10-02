@@ -1,8 +1,6 @@
-FROM amancevice/pandas:alpine as builder
+FROM python:3.10.7-slim-bullseye as builder
 
 WORKDIR /usr/src/app
-
-RUN apk add --update --no-cache build-base
 
 RUN python -m venv /opt/venv
 
@@ -15,13 +13,9 @@ RUN pip install --verbose --upgrade pip
 RUN pip install --verbose --requirement requirements.txt
 
 
-FROM python:3.10.5-alpine
+FROM python:3.10.7-slim-bullseye
 
 WORKDIR /usr/src/app
-
-RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-
-RUN apk add --update --no-cache libstdc++ py3-numpy py3-pandas@testing
 
 COPY --from=builder /opt/venv /opt/venv
 
