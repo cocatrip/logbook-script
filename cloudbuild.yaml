@@ -7,17 +7,6 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA']
 
-# delete old image
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: gcloud
-  args:
-  - 'container'
-  - 'images'
-  - 'delete'
-  - |
-    asia.gcr.io/$PROJECT_ID/logbook-script:$(gcloud container images list-tags --filter='NOT tags:$COMMIT_SHA' --format='get(tags)' asia.gcr.io/$PROJECT_ID/logbook-script)
-  - '--force-delete-tags'
-
 # deploy image
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
