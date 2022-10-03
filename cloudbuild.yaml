@@ -14,7 +14,8 @@ steps:
   - 'container'
   - 'images'
   - 'delete'
-  - "asia.gcr.io/$PROJECT_ID/logbook-script:$(gcloud container images list-tags --filter='NOT tags:$COMMIT_SHA' --format='get(tags)' asia.gcr.io/$PROJECT_ID/logbook-script)"
+  - |
+    asia.gcr.io/$PROJECT_ID/logbook-script:$(gcloud container images list-tags --filter='NOT tags:$COMMIT_SHA' --format='get(tags)' asia.gcr.io/$PROJECT_ID/logbook-script)"
   - '--force-delete-tags'
 
 # deploy image
