@@ -93,7 +93,7 @@ def get_logbook_by_month(months, timestamp_list):
     return logbook_header_id
 
 
-def fill_logbook(email, password, destination):
+def fill_logbook(email, password, strm, destination):
     print(email)
 
     # read csv file
@@ -123,13 +123,7 @@ def fill_logbook(email, password, destination):
         "__RequestVerificationToken": requestVerificationToken,
     })
 
-    # find strm for getting SSO to activity enrichment
-    soup = BeautifulSoup(response.text, "html.parser")
-
-    strm = soup.find("option")["value"]
-    if strm is not None:
-        strm = "2120"
-
+    # use strm for getting SSO to activity enrichment
     response = session.post(
         url + "/Dashboard/Student/IndexStudentDashboard",
         data={"Strm": strm, })
