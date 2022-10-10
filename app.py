@@ -40,10 +40,11 @@ def run():
         data = request.json
         email = data["email"]
         password = data["password"]
+        strm = data["strm"]
         destination = data["destination"]
 
         def generate():
-            for row in fill_logbook(email, password, destination):
+            for row in fill_logbook(email, password, strm, destination):
                 yield(row + '\n')
         return Response(generate(), mimetype='text/html')
     else:
