@@ -1,0 +1,9 @@
+name: logbook-script
+
+build:
+  app:
+    context: .
+    dockerfile: Dockerfile
+
+deploy:
+  - helm upgrade --install logbook-script chart --set image.name=${OKTETO_BUILD_APP_IMAGE}
