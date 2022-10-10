@@ -18,7 +18,7 @@ steps:
   - '--image=asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA'
   - '--region=asia-southeast1'
   - '--allow-unauthenticated'
-  - '--port=8000'
+  - '--port=8080'
 
 images:
 - 'asia.gcr.io/$PROJECT_ID/logbook-script:$COMMIT_SHA'
