@@ -2,7 +2,7 @@
 <html>
   <head>
     {% include "header.html" %}
-    <title>Home</title>
+    <title>Logbook Script - Home</title>
   </head>
   <body>
     <style>
@@ -34,6 +34,17 @@
               placeholder="password123"
               required
             />
+          </td>
+        </tr>
+
+        <tr>
+          <td align="right">Strm:</td>
+          <td>
+            <select name="strm">
+              <option value ="">-</option>
+              <option value ="2120">Even Semester 2021/2022</option>
+              <option value ="2210">Odd Semester 2022/2023</option>
+            </select> 
           </td>
         </tr>
 
@@ -87,8 +98,8 @@
       <tr>
         <footer>
           <br />
-          <b>github:</b>
-          <a href="https://github.com/cocatrip/logbook-script">
+          <b>source:</b>
+          <a href="https://git.cocatrip.xyz/cocatrip/logbook-script">
             cocatrip/logbook-script
           </a>
           <br />
@@ -102,7 +113,5 @@
         </footer>
       </tr>
     </table>
-
-    {% include "darkmode.html" %}
   </body>
 </html>
