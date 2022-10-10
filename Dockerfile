@@ -23,4 +23,4 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY . .
 
-ENTRYPOINT [ "gunicorn", "app:app", "--bind=0.0.0.0:8000", "--keep-alive=120", "--max-requests=3" ]
+ENTRYPOINT [ "gunicorn", "app:app", "--bind=0.0.0.0:8080", "--keep-alive=120", "--max-requests=3" ]
