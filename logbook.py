@@ -43,7 +43,7 @@ def read_logbook_adira(filename):
         df = df.drop(df.index[df[col].isnull()])
 
     df["Date"] = pandas.to_datetime(
-        df["Date"], errors="coerce", format="%d-%m-%Y")
+        df["Date"], errors="coerce", format="%d/%m/%Y")
 
     df["Date"] = df["Date"].dt.strftime("%Y-%m-%dT%H:%M:%S")
 
