@@ -17,6 +17,7 @@ def upload():
 
     email = request.form["email"]
     password = request.form["password"]
+    strm = request.form["strm"]
 
     file = request.files["file"]
     extension = pathlib.Path(file.filename).suffix
@@ -30,7 +31,7 @@ def upload():
 
     return render_template(
         "loading.html", email=email, password=password,
-        destination=destination)
+        destination=destination, strm=strm)
 
 
 @app.route("/run", methods=['POST'])
