@@ -22,8 +22,8 @@ phases:
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - echo Writing image definitions file...
-      - printf '[{"name":"logbook-script","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-
-artifacts:
-  files: imagedefinitions.json
+      - echo updating lambda function...
+      - |-
+        aws lambda update-function-code --function-name logbook-script \
+        --region $AWS_DEFAULT_REGION \
+        --image-uri $REPOSITORY_URI:$IMAGE_TAG
