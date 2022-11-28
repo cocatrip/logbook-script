@@ -8,9 +8,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 COPY requirements.txt ./
 
-RUN pip install --verbose --upgrade pip
-
-RUN pip install --verbose --requirement requirements.txt
+RUN pip install --verbose --no-cache-dir --requirement requirements.txt
 
 
 FROM python:3.10.7-slim-bullseye
