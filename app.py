@@ -1,8 +1,6 @@
 from flask import (Flask, render_template, request,
                    Response, send_from_directory)
 from logbook import fill_logbook
-import pathlib
-import uuid
 import os
 
 app = Flask(__name__)
@@ -11,27 +9,15 @@ app_root = os.path.dirname(os.path.abspath(__file__))
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    target = os.path.join(app_root, 'data')
-    if not os.path.isdir(target):
-        os.makedirs(target)
-
     email = request.form["email"]
     password = request.form["password"]
     strm = request.form["strm"]
-
-    file = request.files["file"]
-    extension = pathlib.Path(file.filename).suffix
-    error = "Extension {} not supported!".format(extension)
-    if extension != ".csv":
-        return render_template("error.html", error=error)
-
-    filename = str(uuid.uuid4()) + ".csv"
-    destination = '/'.join([target, filename])
-    file.save(destination)
+    sheet_id = request.form["sheet_id"]
+    sheet_name = request.form["sheet_name"]
 
     return render_template(
         "loading.html", email=email, password=password,
-        destination=destination, strm=strm)
+        sheet_id=sheet_id, sheet_name=sheet_name, strm=strm)
 
 
 @app.route("/run", methods=['POST'])
@@ -42,11 +28,12 @@ def run():
         email = data["email"]
         password = data["password"]
         strm = data["strm"]
-        destination = data["destination"]
+        sheet_id = data["sheet_id"]
+        sheet_name = data["sheet_name"]
 
         def generate():
-            for row in fill_logbook(email, password, strm, destination):
-                yield(row + '\n')
+            for row in fill_logbook(email, password, strm, sheet_id, sheet_name):
+                yield row + '\n'
         return Response(generate(), mimetype='text/html')
     else:
         return "Content-Type not supported!"

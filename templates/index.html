@@ -4,6 +4,7 @@
     {% include "header.html" %}
     <title>Logbook Script - Home</title>
   </head>
+
   <body>
     <style>
       li {
@@ -41,15 +42,88 @@
           <td align="right">Strm:</td>
           <td>
             <select name="strm">
-              <option value ="2210">Odd Semester 2022/2023</option>
-              <option value ="2120">Even Semester 2021/2022</option>
-            </select> 
+              <option value="2210">Odd Semester 2022/2023</option>
+              <option value="2120">Even Semester 2021/2022</option>
+            </select>
           </td>
         </tr>
 
         <tr>
-          <td align="right">File:</td>
-          <td><input type="file" name="file" required /></td>
+          <td align="right">Sheet ID:</td>
+          <td>
+            <select name="sheet_id">
+              <!-- <option value="13Sde00pOd4E6m4dOA_3lGcUGOs2ATBZxBp-a0vcK-FI"> -->
+              <!--   10. Log Book Aktivitas Magang Binus 3+1 21 November - 20 -->
+              <!--   Desember 2022 -->
+              <!-- </option> -->
+              <option value="1qdCLyWUmqvrMDnzg_4Q-LAoUcK07AQKGTERu-oSMEN8">
+                09. Log Book Aktivitas Magang Binus 3+1 21 Oktober - 20 November
+                2022
+              </option>
+              <option value="1klwdPWVsIKo86GWfbOU_Hw7Up2WGCFCXhlUI8aetNx8">
+                08. Log Book Aktivitas Magang Binus 3+1 21 September - 20
+                Oktober 2022
+              </option>
+            </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="right">Sheet Name:</td>
+          <td>
+            <select name="sheet_name">
+              <option value="">-</option>
+              <option value="Adrianus Vian">Adrianus Vian</option>
+              <option value="Amalia Runi">Amalia Runi</option>
+              <option value="Andrei Oktavian">Andrei Oktavian</option>
+              <option value="Aqila Dhiya Ratu Hafishina">
+                Aqila Dhiya Ratu Hafishina
+              </option>
+              <option value="Bob Marvin Budiarto">Bob Marvin Budiarto</option>
+              <option value="Cherishtara Chrysandrea Ray Ray">
+                Cherishtara Chrysandrea Ray Ray
+              </option>
+              <option value="Daiva Abisha Sujoko">Daiva Abisha Sujoko</option>
+              <option value="Daniel Henry Eleesha">Daniel Henry Eleesha</option>
+              <option value="Dhia Paramanandini">Dhia Paramanandini</option>
+              <option value="Eveline Liauwputri">Eveline Liauwputri</option>
+              <option value="Felicia Katarina">Felicia Katarina</option>
+              <option value="Fenny">Fenny</option>
+              <option value="Findra Faja">Findra Faja</option>
+              <option value="Gabrielle Angela">Gabrielle Angela</option>
+              <option value="Gregoria Andrea Charlota Guritno">
+                Gregoria Andrea Charlota Guritno
+              </option>
+              <option value="Hawinurtama Auliyah">Hawinurtama Auliyah</option>
+              <option value="Ignatius Dillwyn">Ignatius Dillwyn</option>
+              <option value="I Gusti Agung Bagus Kusha Aditya">
+                I Gusti Agung Bagus Kusha Aditya
+              </option>
+              <option value="Jonathan Alexander Malute">
+                Jonathan Alexander Malute
+              </option>
+              <option value="Joshua Jordan Senduk">Joshua Jordan Senduk</option>
+              <option value="Kelvin Lianardo">Kelvin Lianardo</option>
+              <option value="Kevin">Kevin</option>
+              <option value="Masyita Marsyanda Tasya">
+                Masyita Marsyanda Tasya
+              </option>
+              <option value="Muhammad Fadilah">Muhammad Fadilah</option>
+              <option value="Muhammad Fariz Fahreza">
+                Muhammad Fariz Fahreza
+              </option>
+              <option value="Nicolas Andika">Nicolas Andika</option>
+              <option value="Patrick Jonathan Miguel">
+                Patrick Jonathan Miguel
+              </option>
+              <option value="Rafi Ananda Sadikin">Rafi Ananda Sadikin</option>
+              <option value="Sayima Irfani">Sayima Irfani</option>
+              <option value="Steven Lufthanza Bong">
+                Steven Lufthanza Bong
+              </option>
+              <option value="Xenia Dharmawan">Xenia Dharmawan</option>
+            </select>
+          </td>
         </tr>
 
         <tr>
@@ -102,13 +176,14 @@
             cocatrip/logbook-script
           </a>
           <br />
-          <script src="https://utteranc.es/client.js"
-                  repo="cocatrip/logbook-script"
-                  issue-term="pathname"
-                  theme="github-dark"
-                  crossorigin="anonymous"
-                  async>
-          </script>
+          <script
+            src="https://utteranc.es/client.js"
+            repo="cocatrip/logbook-script"
+            issue-term="pathname"
+            theme="github-dark"
+            crossorigin="anonymous"
+            async
+          ></script>
         </footer>
       </tr>
     </table>

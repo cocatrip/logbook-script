@@ -4,6 +4,7 @@ from models import Months, LogBooks
 import pandas
 import numpy
 from datetime import datetime
+import urllib.parse
 
 
 def convert_time(hour, minute):
@@ -14,10 +15,15 @@ def convert_time(hour, minute):
         datetime.strptime(time, "%H:%M").strftime("%I:%M %p")).lower()
 
 
-def read_logbook_adira(filename):
+def read_logbook_adira(sheet_id: str, name: str):
+    print("Constructing url")
+    name = urllib.parse.quote_plus(name)
+    url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={name}"
+    print(url)
+
     print("Reading csv file")
     df = pandas.read_csv(
-        filename,
+        url,
         header=6,
         names=[
             "Day",
@@ -93,13 +99,13 @@ def get_logbook_by_month(months, timestamp_list):
     return logbook_header_id
 
 
-def fill_logbook(email, password, strm, destination):
+def fill_logbook(email, password, strm, sheet_id, name):
     print(email)
 
     # read csv file
-    df = read_logbook_adira(destination)
+    df = read_logbook_adira(sheet_id, name)
     if df.empty:
-        yield("Empty Dataframe")
+        yield "Empty Dataframe"
         return -1
     print(df[["Date", "Notes"]])
 
@@ -157,7 +163,7 @@ def fill_logbook(email, password, strm, destination):
         logbooks = LogBooks(data=response.json()["data"])
 
         print("Filling all saturday as off")
-        yield("Filling all saturday as off")
+        yield "Filling all saturday as off"
         for data in logbooks.data:
             date = datetime.strptime(data.date, "%Y-%m-%dT%H:%M:%S")
             if date.strftime("%w") == "6":
@@ -172,9 +178,9 @@ def fill_logbook(email, password, strm, destination):
                           "model[Description]": "OFF"})
 
                 print(response.json()["status"])
-                yield(response.json()["status"])
+                yield response.json()["status"]
 
-        df = read_logbook_adira(destination)
+        df = read_logbook_adira(sheet_id, name)
         for i in range(0, len(df)):
             id_form = None
             logbook_header_id_form = None
@@ -194,7 +200,7 @@ def fill_logbook(email, password, strm, destination):
 
             logbook = logbooks.data
             print("Filling {}".format(logbook[index].date))
-            yield("Filling {}".format(logbook[index].date))
+            yield "Filling {}".format(logbook[index].date)
             if df["Notes"][i].lower() in ("wfo", "wfh"):
                 clock_in = convert_time(
                     df["Duty On Hour"][i],
@@ -230,4 +236,4 @@ def fill_logbook(email, password, strm, destination):
                       "model[Description]": description_form})
 
             print(response.json()["status"])
-            yield(response.json()["status"])
+            yield response.json()["status"]
