@@ -19,7 +19,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ghcr.io/${{ github.repository_owner }}/cocatrip
+            ghcr.io/${{ github.repository_owner }}/logbook-script
           flavor: |
             latest=auto
             prefix=
