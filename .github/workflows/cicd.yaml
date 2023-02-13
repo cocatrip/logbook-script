@@ -44,21 +44,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-  deploy:
-    environment: master
-    runs-on: self-hosted
-    needs: build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Deploy
-        uses: WyriHaximus/github-action-helm3@v2
-        with:
-          kubeconfig: '${{ secrets.KUBECONFIG }}'
-          exec: |
-            helm upgrade --install \
-                --create-namespace --namespace=logbook-script \
-                logbook-script ./chart --values=./chart/values.yaml \
-                --set=image.tag=${{ github.sha }}
